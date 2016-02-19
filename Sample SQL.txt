@@ -1,0 +1,108 @@
+CREATE TABLE users (
+  id number not null,
+  login varchar2(15) NOT NULL,
+  password varchar2(32) NOT NULL,
+  mail varchar2(255) NOT NULL,
+  sex number(1) DEFAULT 0,
+  money float DEFAULT 0.00,
+  CONSTRAINT UQ_login UNIQUE(login),
+  CONSTRAINT UQ_mail UNIQUE(mail),
+  PRIMARY KEY (id)  
+);
+
+CREATE SEQUENCE users_seq;
+
+
+
+
+
+CREATE OR REPLACE TRIGGER users_ai 
+BEFORE INSERT ON users
+FOR EACH ROW
+
+BEGIN
+  SELECT users_seq.NEXTVAL
+  INTO   :new.id
+  FROM   dual;
+END;
+
+  
+SELECT * FROM USERS;
+  
+  
+  
+  
+DROP TRIGGER users_ai;
+DROP SEQUENCE users_seq;
+DROP TABLE users;
+
+
+-----------------------------------------------------------------
+
+
+CREATE TABLE beats (
+  id number not null,
+  seller_id number NOT NULL,
+  buyer_id number DEFAULT 0,
+  title varchar2(32) NOT NULL,
+  description varchar2(512) DEFAULT 'Brak opisu.',
+  address varchar2(1024) NOT NULL,
+  upload_date varchar2(19) DEFAULT '2016-01-01 00:00:00',
+  transaction_date varchar2(19) DEFAULT '',
+  price float DEFAULT 0.00,
+  status number(1) DEFAULT 0,
+  product_key varchar2(64) default '',
+  CONSTRAINT UQ_address UNIQUE(address),
+  PRIMARY KEY (id)  
+);
+
+CREATE SEQUENCE beats_seq;
+
+
+
+
+CREATE OR REPLACE TRIGGER beats_ai 
+BEFORE INSERT ON beats
+FOR EACH ROW
+
+BEGIN
+  SELECT beats_seq.NEXTVAL
+  INTO   :new.id
+  FROM   dual;
+END;
+
+
+
+CREATE VIEW beatsforsale AS SELECT b.id, b.title, u.login, b.upload_date, b.price FROM users u, beats b WHERE b.seller_id = u.id AND b.status = 1 ORDER BY b.upload_date DESC;
+ 
+CREATE VIEW beatshow AS SELECT b.id as id, b.title, b.description, u.login, b.address, b.upload_date, b.price FROM users u, beats b WHERE b.seller_id = u.id;
+  
+
+
+DROP VIEW beatsforsale;
+DROP VIEW beatshow;
+DROP TRIGGER beats_ai;
+DROP SEQUENCE beats_seq;
+DROP TABLE beats;
+
+
+
+-------------------------------------------------------------------
+
+CREATE TABLE cashouts (
+  cashout_date varchar2(19) DEFAULT '',
+  user_id number not null,  
+  user_data varchar2(512) not null,
+  money float not null,
+  paid number(1) DEFAULT 0
+);
+
+
+DROP TABLE cashouts;
+
+
+
+
+
+UPDATE users SET money = 1000.00 WHERE login = 'Test';
+
